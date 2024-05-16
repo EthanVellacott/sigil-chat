@@ -1,0 +1,27 @@
+name: sigil
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.3.4 <4.0.0'
+
+dependencies:
+  # for the login, chat and so forth
+  firebase_auth: ^4.19.5
+  firebase_core: ^2.31.0
+
+  # easy styled buttons for auth methods 
+  flutter_signin_button: ^2.0.0
+
+  flutter:
+    sdk: flutter
+  cloud_firestore: ^4.17.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
