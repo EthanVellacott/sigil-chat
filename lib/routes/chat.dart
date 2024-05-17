@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
+import 'package:just_the_tooltip/just_the_tooltip.dart';
 
 import 'package:sigil/data/auth.dart';
 import 'package:sigil/data/chat.dart';
@@ -17,6 +19,8 @@ class ChatScreen extends StatelessWidget {
   final ChatService _chat = ChatService();
   final AuthService _auth = AuthService();
 
+  Timestamp? _lastTimestamp;
+
   void sendMessage() async {
     // exit early if text is empty
     if (messageController.text.isEmpty) {
@@ -30,6 +34,7 @@ class ChatScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    _lastTimestamp = null;
     return Scaffold(
         appBar: AppBar(
           title: Text(subjectEmail),
@@ -85,31 +90,54 @@ class ChatScreen extends StatelessWidget {
 
     bool isCurrentUser = data['senderID'] == _auth.getCurrentUser()!.uid;
 
+    Widget messageItem;
     if (isCurrentUser) {
-      return Row(
-        children: [const Spacer(), messageBubble(data['message'], Colors.blue)],
+      messageItem = Row(
+        children: [
+          const Spacer(),
+          messageBubble(data['message'], data['timestamp'], Colors.blue)
+        ],
       );
     } else {
-      return Row(
+      messageItem = Row(
         children: [
-          messageBubble(data['message'], Colors.blueGrey),
+          messageBubble(data['message'], data['timestamp'], Colors.blueGrey),
           const Spacer()
         ],
       );
     }
-    // return Text(data['message']);
+
+    if (_lastTimestamp == null) {
+      _lastTimestamp = data['timestamp'];
+      messageItem = Column(
+        children: [
+          Padding(
+              padding: const EdgeInsets.all(10),
+              child: Text(DateFormat('d MMMM, kk:mm')
+                  .format(_lastTimestamp!.toDate()))),
+          messageItem
+        ],
+      );
+    }
+
+    return messageItem;
   }
 }
 
-Widget messageBubble(String text, Color color) {
-  return Container(
-    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-    margin: const EdgeInsets.all(5),
-    decoration:
-        BoxDecoration(color: color, borderRadius: BorderRadius.circular(30)),
-    child: Text(
-      text,
-      overflow: TextOverflow.fade,
-    ),
-  );
+Widget messageBubble(String text, Timestamp timestamp, Color color) {
+  return JustTheTooltip(
+      preferredDirection: AxisDirection.right,
+      content: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(DateFormat('d MMMM, kk:mm').format(timestamp.toDate()))),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+        margin: const EdgeInsets.all(5),
+        decoration: BoxDecoration(
+            color: color, borderRadius: BorderRadius.circular(30)),
+        child: Text(
+          text,
+          overflow: TextOverflow.fade,
+        ),
+      ));
 }

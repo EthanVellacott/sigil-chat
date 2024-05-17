@@ -11,8 +11,11 @@ dependencies:
   firebase_auth: ^4.19.5
   firebase_core: ^2.31.0
 
-  # easy styled buttons for auth methods 
-  flutter_signin_button: ^2.0.0
+  # datetime formatting
+  intl: ^0.19.0
+
+  # better tooltips 
+  just_the_tooltip: ^0.0.12
 
   flutter:
     sdk: flutter
